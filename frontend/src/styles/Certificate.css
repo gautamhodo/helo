@@ -1,0 +1,95 @@
+/* Certificate.css */
+
+.certificate-container {
+  max-width: 700px;
+  margin: 2rem auto;
+  background: #fff;
+  border: 2px solid #2d4a6a;
+  border-radius: 10px;
+  box-shadow: 0 4px 16px rgba(44, 74, 106, 0.08);
+  padding: 2.5rem 2rem;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  color: #222;
+}
+
+.certificate-header {
+  text-align: center;
+  border-bottom: 2px solid #2d4a6a;
+  padding-bottom: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.certificate-logo {
+  width: 60px;
+  margin-bottom: 0.5rem;
+}
+
+.certificate-title {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: #2d4a6a;
+  margin-bottom: 0.2rem;
+}
+
+.certificate-subtitle {
+  font-size: 1.1rem;
+  color: #444;
+  margin-bottom: 0.5rem;
+}
+
+.certificate-section-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #2d4a6a;
+  margin-top: 1.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.certificate-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-bottom: 1.5rem;
+}
+
+.certificate-table th,
+.certificate-table td {
+  text-align: left;
+  padding: 0.5rem 0.7rem;
+  border-bottom: 1px solid #e0e0e0;
+  font-size: 1rem;
+}
+
+.certificate-table th {
+  background: #f4f8fb;
+  color: #2d4a6a;
+  font-weight: 600;
+}
+
+.certificate-table tr:last-child td {
+  border-bottom: none;
+}
+
+.certificate-footer {
+  text-align: right;
+  margin-top: 2rem;
+  color: #2d4a6a;
+  font-size: 0.95rem;
+}
+
+@media (max-width: 800px) {
+  .certificate-container {
+    padding: 1rem 0.5rem;
+  }
+}
+
+.certificate-list-item {
+  border: 2px solid #2d4a6a;
+  border-radius: 8px;
+  padding: 1rem 1.5rem;
+  margin-bottom: 1.2rem;
+  background: #fff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  box-shadow: 0 2px 8px rgba(44, 74, 106, 0.06);
+} 

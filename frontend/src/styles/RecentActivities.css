@@ -1,0 +1,66 @@
+/* Recent Activities Component Styles */
+
+/* Remove the grid layout since it's now controlled by parent container */
+/* .recent-activities-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 1024px) {
+  .recent-activities-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+} */
+
+.recent-activities-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.recent-activities-date-input {
+  width: 8rem;
+}
+
+.recent-activities-content {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.recent-activity-item {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem;
+  background-color: hsl(var(--muted) / 0.5);
+  border-radius: 0.5rem;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.recent-activity-item:hover {
+  background: linear-gradient(90deg, #82ffff 0%, #5f72bd 100%);
+  color: #fff;
+}
+
+.recent-activity-icon {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.recent-activity-text {
+  font-weight: 500;
+}
+
+.recent-activity-subtext {
+  font-size: 0.875rem;
+  color: hsl(var(--muted-foreground));
+}
+
+.recent-activities-empty {
+  color: hsl(var(--muted-foreground));
+  text-align: center;
+  padding: 1rem 0;
+}
