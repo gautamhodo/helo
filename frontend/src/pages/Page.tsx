@@ -7,54 +7,35 @@ import PageContainer from '../components/PageContainer';
 import SectionHeading from '../components/SectionHeading';
 import RecentActivities from '../components/RecentActivities';
 import QuickActions from '../components/QuickActions';
+import db from '../../db.json';
 
 // import Searchbar from '../components/Searchbar';
 // import Table from '../components/Table';
 // import vehicleData from '../../db.json';
-
-interface Claim {
-  claimAmount?: string | number;
-}
-
-interface Vehicle {
-  insurance?: boolean;
-  claims?: Claim[];
-}
-
-interface Stats {
-  totalVehicles: number;
-  totalInsurances: number;
-  totalClaims: number;
-  totalClaimAmount: number;
-  insuranceCoverage: string;
-}
-
 
 interface PageProps {
   sidebarCollapsed?: boolean;
   toggleSidebar?: () => void;
 }
 
-
+const stats = db.statistics;
 
 const Page: React.FC<PageProps> = ({ sidebarCollapsed = false, toggleSidebar }) => {
-  const [stats, setStats] = useState<Stats>({
-    totalVehicles: 0,
-    totalInsurances: 0,
-    totalClaims: 0,
-    totalClaimAmount: 0,
-    insuranceCoverage: '0%',
-  });
+  const [stats, setStats] = useState<any>({});
+  const [birthCount, setBirthCount] = useState(0);
+  const [deathCount, setDeathCount] = useState(0);
+  const [totalCount, setTotalCount] = useState(0);
+  const [certCount, setCertCount] = useState(0);
 
   useEffect(() => {
-    // Mock data - replace with actual API call
-    setStats({
-      totalVehicles: 1250,
-      totalInsurances: 890,
-      totalClaims: 2140,
-      totalClaimAmount: 1250,
-      insuranceCoverage: '85%',
-    });
+    fetch('/db.json')
+      .then(res => res.json())
+      .then(data => {
+        setBirthCount((data.birthRecords || []).length);
+        setDeathCount((data.deathRecords || []).length);
+        setTotalCount((data.birthRecords || []).length + (data.deathRecords || []).length);
+        setCertCount((data.birthRecords || []).length + (data.deathRecords || []).length); // Assuming certificates = all records
+      });
   }, []);
 
   return (
@@ -66,19 +47,19 @@ const Page: React.FC<PageProps> = ({ sidebarCollapsed = false, toggleSidebar }) 
     <SectionHeading title="Dashboard" subtitle="Overview of registration system statistics" />
       <div className="dashboard-summary-cards">
         {[
-          { title: 'Total Birth Count', subtitle: stats.totalVehicles.toString() },
-          { title: 'Total Death Count', subtitle: stats.totalInsurances.toString() },
-          { title: 'Total Records', subtitle: stats.totalClaims.toString() },
-          { title: 'Certificates Available', subtitle: `${stats.totalClaimAmount}` },
+          { title: 'Total Birth Count', subtitle: birthCount },
+          { title: 'Total Death Count', subtitle: deathCount },
+          { title: 'Total Records', subtitle: totalCount },
+          { title: 'Certificates Available', subtitle: certCount },
         ].map((card, index) => (
-          <Cards key={index} title={card.title} subtitle={card.subtitle} />
+          <Cards key={index} title={card.title} subtitle={card.subtitle && card.subtitle !== 0 ? card.subtitle : undefined} />
         ))}
       </div>
       
       {/* Container for Recent Activities and Quick Actions side by side */}
       <div className="dashboard-components-container">
         <RecentActivities/>
-        <QuickActions/>
+        <QuickActions />
       </div>
 
       </PageContainer>

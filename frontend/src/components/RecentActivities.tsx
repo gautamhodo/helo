@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Baby, Heart } from "lucide-react";
 import "../styles/RecentActivities.css";
+import { useNavigate } from 'react-router-dom';
 
 interface Activity {
   id: string;
@@ -11,43 +12,37 @@ interface Activity {
   color: string;
 }
 
-interface RecentActivitiesProps {
-  onActivityClick?: (activity: Activity) => void;
-}
-
-const RecentActivities: React.FC<RecentActivitiesProps> = ({ onActivityClick }) => {
+const RecentActivities = () => {
   const [dateFilter, setDateFilter] = useState<string>("");
   const [recentActivities, setRecentActivities] = useState<Activity[]>([]);
+  const [showAll, setShowAll] = useState(false);
+  const navigate = useNavigate();
 
   // Mock data - replace with actual API call
   useEffect(() => {
-    const mockActivities: Activity[] = [
-      {
-        id: "1",
-        type: "birth",
-        name: "John Doe",
-        date: new Date(Date.now() - 2 * 60 * 60 * 1000), // 2 hours ago
-        icon: Baby,
-        color: "text-success"
-      },
-      {
-        id: "2",
-        type: "death",
-        name: "Jane Smith",
-        date: new Date(Date.now() - 4 * 60 * 60 * 1000), // 4 hours ago
-        icon: Heart,
-        color: "text-danger"
-      },
-      {
-        id: "3",
-        type: "birth",
-        name: "Mike Johnson",
-        date: new Date(Date.now() - 6 * 60 * 60 * 1000), // 6 hours ago
-        icon: Baby,
-        color: "text-success"
-      }
-    ];
-    setRecentActivities(mockActivities);
+    fetch('/db.json')
+      .then(res => res.json())
+      .then(data => {
+        const birthActivities = (data.birthRecords || []).map((record: any) => ({
+          id: `birth-${record.id}`,
+          type: 'birth',
+          name: `${record.firstName} ${record.lastName}`,
+          date: new Date(record.dateOfBirth),
+          icon: Baby,
+          color: 'text-success',
+        }));
+        const deathActivities = (data.deathRecords || []).map((record: any) => ({
+          id: `death-${record.id}`,
+          type: 'death',
+          name: `${record.firstName} ${record.lastName}`,
+          date: new Date(record.dateOfBirth), // No dateOfDeath in data, so using dateOfBirth
+          icon: Heart,
+          color: 'text-danger',
+        }));
+        // Combine and sort by date descending
+        const allActivities = [...birthActivities, ...deathActivities].sort((a, b) => b.date.getTime() - a.date.getTime());
+        setRecentActivities(allActivities);
+      });
   }, []);
 
   const formatTimeAgo = (date: Date): string => {
@@ -66,10 +61,8 @@ const RecentActivities: React.FC<RecentActivitiesProps> = ({ onActivityClick }) 
   };
 
   const handleActivityClick = (activity: Activity) => {
-    if (onActivityClick) {
-      onActivityClick(activity);
-    }
-    console.log("Activity clicked:", activity);
+    const [type, recordId] = activity.id.split('-');
+    navigate(`/profile/${type}/${recordId}`);
   };
 
   const handleDateFilterChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -83,45 +76,53 @@ const RecentActivities: React.FC<RecentActivitiesProps> = ({ onActivityClick }) 
       })
     : recentActivities;
 
+  const activitiesToShow = showAll ? filteredActivities : filteredActivities.slice(0, 2);
+
   return (
-    <div className="card">
-      <div className="card-header">
-        <div className="recent-activities-header">
-          <h5 className="card-title mb-0">Recent Activities</h5>
-          <input
-            type="date"
-            value={dateFilter}
-            onChange={handleDateFilterChange}
-            className="form-control recent-activities-date-input"
-          />
+    <div className="recent-activities-card">
+      <div className="recent-activities-header">
+        <div>
+          <span className="recent-activities-title">Recent Activity</span>
+          <span className="recent-activities-subtitle">Latest Registrations</span>
         </div>
+        <input
+          type="date"
+          value={dateFilter}
+          onChange={handleDateFilterChange}
+          className="recent-activities-date-input"
+        />
       </div>
-      <div className="card-body">
-        <div className="recent-activities-content">
-          {filteredActivities.length > 0 ? (
-            filteredActivities.map((activity) => (
+      <div className="recent-activities-list">
+        {filteredActivities.length > 0 ? (
+          <>
+            {activitiesToShow.map((activity) => (
               <div 
                 key={activity.id} 
-                className="recent-activity-item"
+                className="recent-activity-list-item"
                 onClick={() => handleActivityClick(activity)}
               >
-                <activity.icon className={`recent-activity-icon ${activity.color}`} />
+                <activity.icon className={`recent-activity-list-icon ${activity.color}`} />
                 <div>
-                  <p className="recent-activity-text">
+                  <p className="recent-activity-list-text">
                     {activity.type === 'birth' ? 'New birth registered' : 'New death registered'}
                   </p>
-                  <p className="recent-activity-subtext">
+                  <p className="recent-activity-list-subtext">
                     {activity.name} - {formatTimeAgo(activity.date)}
                   </p>
                 </div>
               </div>
-            ))
-          ) : (
-            <p className="recent-activities-empty">
-              {dateFilter ? "No activities found for selected date" : "No recent activities"}
-            </p>
-          )}
-        </div>
+            ))}
+            {filteredActivities.length > 2 && (
+              <button className="recent-activities-more-btn" onClick={() => setShowAll(!showAll)}>
+                {showAll ? 'Show less' : 'More...'}
+              </button>
+            )}
+          </>
+        ) : (
+          <p className="recent-activities-empty">
+            {dateFilter ? "No activities found for selected date" : "No recent activities"}
+          </p>
+        )}
       </div>
     </div>
   );

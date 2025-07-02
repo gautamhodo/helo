@@ -8,8 +8,8 @@ interface QuickActionsProps {
 }
 
 const QuickActions: React.FC<QuickActionsProps> = ({ onQuickAction }) => {
-  const [showRecordTypeDialog, setShowRecordTypeDialog] = useState<boolean>(false);
   const navigate = useNavigate();
+  const [showRecordTypeDialog, setShowRecordTypeDialog] = useState<boolean>(false);
 
   const handleQuickAction = (action: string) => {
     if (onQuickAction) {
@@ -31,6 +31,9 @@ const QuickActions: React.FC<QuickActionsProps> = ({ onQuickAction }) => {
       case 'death-records':
         navigate('/death-records');
         break;
+      case 'view-records':
+        navigate('/view-records');
+        break;
       default:
         break;
     }
@@ -40,97 +43,76 @@ const QuickActions: React.FC<QuickActionsProps> = ({ onQuickAction }) => {
     setShowRecordTypeDialog(false);
   };
 
-  const handleViewRecords = () => {
-    setShowRecordTypeDialog(true);
-  };
-
   return (
-    <div className="card">
-      <div className="card-header">
-        <h5 className="card-title mb-0">Quick Actions</h5>
+    <div className="quick-actions-card">
+      <div className="quick-actions-header">
+        <span className="quick-actions-title">Quick Actions</span>
+        <span className="quick-actions-subtitle">Common Birth and Death Registration Tasks</span>
       </div>
-      <div className="card-body">
-        <div className="quick-actions-grid">
-          <button 
-            onClick={() => handleQuickAction("birth-registration")}
-            className="quick-action-button birth-registration"
-          >
-            <FileText className="quick-action-icon" />
-            <span className="quick-action-text">New Birth Registration</span>
-          </button>
-          
-          <button 
-            onClick={() => handleQuickAction("death-registration")}
-            className="quick-action-button death-registration"
-          >
-            <ScrollText className="quick-action-icon" />
-            <span className="quick-action-text">New Death Registration</span>
-          </button>
-          
-          <button 
-            onClick={handleViewRecords}
-            className="quick-action-button"
-          >
-            <Users className="quick-action-icon" />
-            <span className="quick-action-text">View Records</span>
-          </button>
-          
-          <button 
-            onClick={() => handleQuickAction("certificates")}
-            className="quick-action-button accent"
-          >
-            <Award className="quick-action-icon" />
-            <span className="quick-action-text">Generate Certificate</span>
-          </button>
-        </div>
-
-        {/* Modal for Record Type Selection */}
-        {showRecordTypeDialog && (
-          <div className="modal fade show" style={{ display: 'block' }} tabIndex={-1}>
-            <div className="modal-dialog modal-dialog-centered">
-              <div className="modal-content quick-action-dialog-content">
-                <div className="modal-header">
-                  <h5 className="modal-title">Select Record Type</h5>
-                  <button 
-                    type="button" 
-                    className="btn-close" 
-                    onClick={handleDialogClose}
-                    aria-label="Close"
-                  ></button>
-                </div>
-                <div className="modal-body">
-                  <p className="text-muted">
-                    Choose which type of records you want to view
-                  </p>
-                  <div className="quick-action-dialog-grid">
-                    <button
-                      onClick={() => {
-                        handleDialogClose();
-                        handleQuickAction("birth-records");
-                      }}
-                      className="quick-action-dialog-button"
-                    >
-                      <FileText className="quick-action-dialog-icon" />
-                      <span>Birth Records</span>
-                    </button>
-                    <button
-                      onClick={() => {
-                        handleDialogClose();
-                        handleQuickAction("death-records");
-                      }}
-                      className="quick-action-dialog-button"
-                    >
-                      <ScrollText className="quick-action-dialog-icon" />
-                      <span>Death Records</span>
-                    </button>
-                  </div>
-                </div>
-              </div>
+      <div className="quick-actions-grid">
+        <button 
+          onClick={() => handleQuickAction("birth-registration")}
+          className="quick-action-btn"
+        >
+          <FileText className="quick-action-btn-icon" />
+          <span className="quick-action-btn-text">New Birth Registration</span>
+        </button>
+        <button 
+          onClick={() => handleQuickAction("death-registration")}
+          className="quick-action-btn"
+        >
+          <ScrollText className="quick-action-btn-icon" />
+          <span className="quick-action-btn-text">New Death Registration</span>
+        </button>
+        <button 
+          onClick={() => setShowRecordTypeDialog(true)}
+          className="quick-action-btn"
+        >
+          <Users className="quick-action-btn-icon" />
+          <span className="quick-action-btn-text">View Records</span>
+        </button>
+        <button 
+          onClick={() => handleQuickAction("certificates")}
+          className="quick-action-btn"
+        >
+          <Award className="quick-action-btn-icon" />
+          <span className="quick-action-btn-text">Certificates</span>
+        </button>
+      </div>
+      {showRecordTypeDialog && (
+        <div className="quick-action-modal-overlay">
+          <div className="quick-action-modal">
+            <button
+              onClick={handleDialogClose}
+              className="quick-action-modal-close"
+              aria-label="Close"
+            >
+              ×
+            </button>
+            <h3 className="quick-action-modal-title">Select Record Type</h3>
+            <div className="quick-action-modal-options">
+              <button
+                onClick={() => {
+                  handleDialogClose();
+                  navigate('/birth-records');
+                }}
+                className="quick-action-modal-option"
+              >
+                <FileText className="quick-action-modal-icon" /> Birth Records
+              </button>
+              <button
+                onClick={() => {
+                  handleDialogClose();
+                  navigate('/death-records');
+                }}
+                className="quick-action-modal-option"
+              >
+                <ScrollText className="quick-action-modal-icon" /> Death Records
+              </button>
             </div>
-            <div className="modal-backdrop fade show" onClick={handleDialogClose}></div>
           </div>
-        )}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

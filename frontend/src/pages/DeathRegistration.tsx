@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../styles/page.css';
 import '../styles/form.css';
 import Header from '../components/Header';
@@ -11,6 +11,8 @@ import AddInput from '../components/AddInput';
 import DateInput from '../components/DateInput';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import axios from 'axios';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 interface PageProps {
   sidebarCollapsed?: boolean;
@@ -32,6 +34,7 @@ const DeathRegistration: React.FC<PageProps> = ({ sidebarCollapsed = false, togg
     middleName: '',
     lastName: '',
     dateOfBirth: '',
+    dateOfDeath: '',
     idProof: '',
     idProofOther: '',
     gender: '',
@@ -44,22 +47,28 @@ const DeathRegistration: React.FC<PageProps> = ({ sidebarCollapsed = false, togg
   const [popupMessage, setPopupMessage] = useState('');
   const [showDownload, setShowDownload] = useState(false);
   const [lastRegistered, setLastRegistered] = useState<any>(null);
-  const [printView, setPrintView] = useState(false);
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const id = params.get('id');
+    if (id) {
+      fetch(`/db.json`)
+        .then(res => res.json())
+        .then(data => {
+          const rec = (data.deathRecords || []).find((r: any) => String(r.id) === id);
+          if (rec) setForm(rec);
+        });
+    }
+  }, [location.search]);
 
   const handleChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setForm({ ...form, [field]: e.target.value });
   };
 
-  const handlePrint = () => {
-    setPrintView(true);
-    setTimeout(() => {
-    window.print();
-      setPrintView(false);
-    }, 200);
-  };
-
-  const handleRegisterDeath = () => {
-    const requiredFields = ['firstName', 'lastName', 'dateOfBirth', 'idProof', 'gender', 'permanentAddress', 'causeOfDeath'];
+  const handleRegisterDeath = async () => {
+    const requiredFields = ['firstName', 'lastName', 'dateOfBirth', 'dateOfDeath', 'idProof', 'gender', 'permanentAddress', 'causeOfDeath'];
     let isFormValid = requiredFields.every(field => (form as any)[field].trim() !== '');
 
     if (form.idProof === 'other' && form.idProofOther.trim() === '') {
@@ -77,14 +86,38 @@ const DeathRegistration: React.FC<PageProps> = ({ sidebarCollapsed = false, togg
     }
 
     setIsLoading(true);
-    // Simulate API call
-    setTimeout(() => {
+
+    try {
+      const params = new URLSearchParams(location.search);
+      const id = params.get('id');
+      if (id) {
+        // Edit mode: PUT
+        await fetch(`http://localhost:3000/deathRecords/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(form),
+        });
+        setPopupMessage('Death record updated successfully!');
+      } else {
+        // POST to json-server
+        const response = await fetch('http://localhost:3000/deathRecords', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(form),
+        });
+        const data = await response.json();
+        setLastRegistered({ ...form, id: data.id });
+        setPopupMessage('Death registered successfully!');
+      }
       setIsLoading(false);
-      setPopupMessage('Death registered successfully!');
       setShowPopup(true);
       setShowDownload(true);
-      setLastRegistered({ ...form });
-    }, 1500);
+    } catch (error) {
+      setIsLoading(false);
+      setPopupMessage('Failed to register death. Please try again.');
+      setShowPopup(true);
+      setShowDownload(false);
+    }
   };
 
   const handleDownloadCertificate = async () => {
@@ -125,6 +158,15 @@ const DeathRegistration: React.FC<PageProps> = ({ sidebarCollapsed = false, togg
               <div className="form-col">
                 <DateInput label="Date of Birth" value={form.dateOfBirth} onChange={handleChange('dateOfBirth')} />
               </div>
+              <div className="form-col">
+                <DateInput label="Date of Death" value={form.dateOfDeath} onChange={handleChange('dateOfDeath')} />
+              </div>
+              <div className="form-col">
+                <DropInput label="Gender" value={form.gender} onChange={handleChange('gender')} options={[
+                  { label: 'Male', value: 'male' },
+                  { label: 'Female', value: 'female' },
+                ]} />
+              </div>
             </div>
             <div className="form-row">
               <div className="form-col">
@@ -140,14 +182,6 @@ const DeathRegistration: React.FC<PageProps> = ({ sidebarCollapsed = false, togg
                   <Input label="Specify Other ID Proof" value={form.idProofOther} onChange={handleChange('idProofOther')} placeholder="Enter other ID proof" />
                 </div>
               )}
-            </div>
-            <div className="form-row">
-              <div className="form-col">
-                <DropInput label="Gender" value={form.gender} onChange={handleChange('gender')} options={[
-                  { label: 'Male', value: 'male' },
-                  { label: 'Female', value: 'female' },
-                ]} />
-              </div>
             </div>
             <div className="form-row">
               <div className="form-col">
@@ -179,7 +213,7 @@ const DeathRegistration: React.FC<PageProps> = ({ sidebarCollapsed = false, togg
         </form>
         {showPopup && (
           <div>
-            <Popup message={popupMessage} onClose={() => { setShowPopup(false); setShowDownload(false); }} />
+            <Popup message={popupMessage} onClose={() => { setShowPopup(false); setShowDownload(false); navigate('/death-records'); }} />
             {showDownload && lastRegistered && (
               <div style={{ textAlign: 'center', marginTop: '1rem' }}>
                 <button className="btn-with-gradient" onClick={handleDownloadCertificate}>Download Certificate</button>
@@ -198,7 +232,7 @@ const DeathRegistration: React.FC<PageProps> = ({ sidebarCollapsed = false, togg
                           <th>Name of Deceased</th>
                           <td>{lastRegistered.firstName} {lastRegistered.middleName} {lastRegistered.lastName}</td>
                           <th>Date of Death</th>
-                          <td>{lastRegistered.dateOfBirth}</td>
+                          <td>{lastRegistered.dateOfDeath}</td>
                         </tr>
                         <tr>
                           <th>Gender</th>
@@ -224,47 +258,6 @@ const DeathRegistration: React.FC<PageProps> = ({ sidebarCollapsed = false, togg
                 </div>
               </div>
             )}
-          </div>
-        )}
-        {printView && (
-          <div style={{ position: 'absolute', left: '-9999px', top: 0 }}>
-            <div className="certificate-container" id="certificate-pdf-view">
-              <div className="certificate-header">
-                <div className="certificate-title">REGISTRATION DEPARTMENT</div>
-                <div className="certificate-subtitle">Govt. of Kerala</div>
-                <div style={{ fontWeight: 500, color: '#2d4a6a', marginTop: '0.2rem' }}>
-                  (Export of Online Token Registration)
-                </div>
-              </div>
-              <table className="certificate-table">
-                <tbody>
-                  <tr>
-                    <th>Name of Deceased</th>
-                    <td>{form.firstName} {form.middleName} {form.lastName}</td>
-                    <th>Date of Death</th>
-                    <td>{form.dateOfBirth}</td>
-                  </tr>
-                  <tr>
-                    <th>Gender</th>
-                    <td>{form.gender}</td>
-                    <th>Permanent Address</th>
-                    <td>{form.permanentAddress}</td>
-                  </tr>
-                  <tr>
-                    <th>Cause of Death</th>
-                    <td colSpan={3}>{form.causeOfDeath === 'other' ? form.causeOfDeathOther : form.causeOfDeath}</td>
-                  </tr>
-                  <tr>
-                    <th>ID Proof</th>
-                    <td colSpan={3}>{form.idProof === 'other' ? form.idProofOther : form.idProof}</td>
-                  </tr>
-                </tbody>
-              </table>
-              <div className="certificate-footer">
-                <div>Generated on: {new Date().toLocaleDateString()}</div>
-                <div>Signature: ____________________</div>
-              </div>
-            </div>
           </div>
         )}
       </PageContainer>

@@ -83,13 +83,73 @@
 }
 
 .certificate-list-item {
-  border: 2px solid #2d4a6a;
-  border-radius: 8px;
-  padding: 1rem 1.5rem;
-  margin-bottom: 1.2rem;
-  background: #fff;
+  border: 1.5px solid #e5e7eb;
+  border-left: 5px solid #0d92ae;
+  border-radius: 10px;
+  padding: 1.1rem 1.7rem;
+  margin-bottom: 1.1rem;
+  background: #f9fbfd;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  box-shadow: 0 2px 8px rgba(44, 74, 106, 0.06);
+  box-shadow: 0 2px 8px rgba(44, 74, 106, 0.04);
+  transition: box-shadow 0.18s, border-color 0.18s, background 0.18s;
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
+.certificate-list-item:hover {
+  box-shadow: 0 4px 16px rgba(44, 74, 106, 0.10);
+  border-left: 5px solid #0d92ae;
+  background: #f4f8fb;
+}
+.certificate-list-item strong {
+  color: #2d4a6a;
+  font-size: 1.08rem;
+  font-weight: 600;
+}
+.certificate-list-item div {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+.certificate-list-actions button {
+  background: #eaf3fa;
+  border: none;
+  border-radius: 6px;
+  padding: 0.45rem 0.7rem;
+  cursor: pointer;
+  transition: background 0.18s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.certificate-list-actions button:hover {
+  background: #0d92ae;
+}
+.certificate-list-actions svg {
+  color: #2d4a6a;
+  transition: color 0.18s;
+}
+.certificate-list-actions button:hover svg {
+  color: #fff;
+}
+
+@media print {
+  body * {
+    visibility: hidden !important;
+  }
+  .print-certificate-only, .print-certificate-only * {
+    visibility: visible !important;
+  }
+  .print-certificate-only {
+    position: absolute !important;
+    left: 0;
+    top: 0;
+    width: 100vw;
+    min-height: 100vh;
+    background: white !important;
+    z-index: 9999;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 } 

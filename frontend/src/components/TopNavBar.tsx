@@ -12,7 +12,6 @@ const TopNavBar: React.FC = () => {
   const dropdownRef = useRef<HTMLLIElement>(null);
   const [notificationOpen, setNotificationOpen] = useState(false);
   const notificationRef = useRef<HTMLDivElement>(null);
-  const [clearedNotifications, setClearedNotifications] = useState<Set<string>>(new Set());
 
   useEffect(() => {
     if (!dropdownOpen) return;
@@ -73,32 +72,6 @@ const TopNavBar: React.FC = () => {
   //   fetchExpiringVehicles();
   // }, []);
 
-  const handleNotificationClick = (e: React.MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
-    // if (expiringVehicles.length === 0) {
-    //   alert("No vehicles with insurance expiring soon.");
-    //   return;
-    // }
-    // const msg = expiringVehicles
-    //   .map(
-    //     (v) =>
-    //       `${v.registrationNumber} (${v.make} ${v.model}) - Insurance expires on: ${v.insurance?.endDate}`
-    //   )
-    //   .join("\n");
-    alert("Vehicles with insurance expiring soon:\n" );
-  };
-
-  const handleClearNotifications = () => {
-    // Add all current expiring vehicles to the cleared set
-    // const currentIds = expiringVehicles.map(v => v.id || v.registrationNumber);
-    // setClearedNotifications(prev => new Set([...prev, ...currentIds]));
-    // setNotificationOpen(false);
-  };
-
-  const getVisibleNotifications = () => {
-    // return expiringVehicles.filter(v => !clearedNotifications.has(v.id || v.registrationNumber));
-  };
-
   return (
     <nav className="top-navbar">
       <div className="navItem">
@@ -112,7 +85,7 @@ const TopNavBar: React.FC = () => {
           <ul className="nav-list2">
             <li className='nav-link'>
               <NavLink
-                to="/dashboard"
+                to="/"
                 className={({ isActive }) => isActive ? 'active' : ''}
                 style={{ fontSize: '14px', fontWeight: 400,color:'#cccccc' }}
               >
@@ -224,50 +197,7 @@ const TopNavBar: React.FC = () => {
                 }}
               >
                 <i className="fas fa-bell  mt-1"></i>
-                {/* {getVisibleNotifications().length > 0 && (
-                  <span className="notification-badge">{getVisibleNotifications().length}</span>
-                )} */}
               </a>
-              {notificationOpen && (
-                <div className="notification-dropdown" ref={notificationRef}>
-                  <div className="notification-header">
-                    <div className="notification-title">
-                      Insurance Expiry Alerts
-                    </div>
-                    {/* {getVisibleNotifications().length > 0 && (
-                      <button 
-                        className="clear-notifications-btn"
-                        onClick={handleClearNotifications}
-                        title="Clear all notifications"
-                      >
-                        Clear
-                      </button>
-                    )} */}
-                  </div>
-                  {/* {getVisibleNotifications().length === 0 ? (
-                    <div className="notification-empty">
-                      No vehicles with insurance expiring soon.
-                    </div>
-                  ) : (
-                    <ul className="notification-list">
-                      {getVisibleNotifications().map((v, idx) => (
-                        <li key={v.id || idx} className="notification-item">
-                          <span className="notif-reg text-uppercase">
-                            {v.registrationNumber}
-                          </span>{" "}
-                          <span className="notif-make text-capitalize">
-                            ({v.make} {v.model})
-                          </span>
-                          <br />
-                          <span className="notif-expiry">
-                            Expires: {v.insurance?.endDate}
-                          </span>
-                        </li>
-                      ))}
-                    </ul>
-                  )} */}
-                </div>
-              )}
             </div>
             <div className="nav-div">
               <a href="#" className="nav-link text-white" onClick={(e: React.MouseEvent<HTMLAnchorElement>) => {

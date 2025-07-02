@@ -41,6 +41,12 @@
   background-color: #f5f5f5;
 }
 
+.action-buttons {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
 .action-buttons button {
   margin-right: 0.5rem;
   padding: 0.3rem 0.8rem;

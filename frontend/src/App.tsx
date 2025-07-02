@@ -19,6 +19,7 @@ import DeathRegistration from './pages/DeathRegistration.tsx';
 import BirthRecords from './pages/BirthRecords.tsx';
 import Certificates from './pages/Certificates.tsx';
 import DeathRecords from './pages/DeathRecords.tsx';
+import Profile from './pages/Profile.tsx';
 
 import SideBar from './components/SideBar';
 import Page from './pages/Page.tsx';
@@ -52,13 +53,14 @@ const App: React.FC = () => {
           <SideBar collapsed={sidebarCollapsed}/>
           <div style={{ flex: 1, padding: '10px', overflowY: 'auto' }}>
             <Routes>
-              <Route path="/dashboard" element={<Page sidebarCollapsed={sidebarCollapsed} toggleSidebar={toggleSidebar}/>} />
+              <Route path="/" element={<Page sidebarCollapsed={sidebarCollapsed} toggleSidebar={toggleSidebar}/>} />
               <Route path="/birth-registration" element={<BirthRegistration sidebarCollapsed={sidebarCollapsed} toggleSidebar={toggleSidebar} />} />
               <Route path="/death-registration" element={<DeathRegistration sidebarCollapsed={sidebarCollapsed} toggleSidebar={toggleSidebar} />} />
               <Route path="/birth-records" element={<BirthRecords sidebarCollapsed={sidebarCollapsed} toggleSidebar={toggleSidebar} />} />
               <Route path="/death-records" element={<DeathRecords sidebarCollapsed={sidebarCollapsed} toggleSidebar={toggleSidebar} />} />
               <Route path="/certificates" element={<Certificates sidebarCollapsed={sidebarCollapsed} toggleSidebar={toggleSidebar} />} />
               <Route path="/a" element={<Table/>} />
+              <Route path="/profile/:type/:id" element={<Profile />} />
               {/* <Route path="/" element={<page />} /> */}
               {/* <Route path="/dashboard" element={<Dashboard sidebarCollapsed={sidebarCollapsed} toggleSidebar={toggleSidebar} />} />
               <Route path="/register-vehicle" element={<VehicleRegistration sidebarCollapsed={sidebarCollapsed} toggleSidebar={toggleSidebar} />} />

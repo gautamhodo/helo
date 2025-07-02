@@ -119,16 +119,19 @@
   justify-content: center;
   background: linear-gradient(135deg, rgb(5, 130, 172), rgb(16, 85, 97));
   border-radius: 3px;
-  font-size: 14px;
+  font-size: 15px;
   height: 36px;
   padding: 0 16px;
   color: #ffffff;
   border: none;
   width: fit-content;
-  min-width: 80px;
+  min-width: 120px;
   text-decoration: none;
   transition: all 0.3s ease;
   cursor: pointer;
+  box-sizing: border-box;
+  white-space: nowrap;
+  vertical-align: middle;
 }
 
 .btn-with-gradient:hover {

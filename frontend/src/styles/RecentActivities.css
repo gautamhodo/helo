@@ -13,54 +13,91 @@
   }
 } */
 
+/* Minimal card for Recent Activities */
+.recent-activities-card {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+  padding: 1.5rem 1.5rem 1.2rem 1.5rem;
+  box-shadow: none;
+  min-width: 320px;
+}
+
 .recent-activities-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
+  margin-bottom: 1.2rem;
+}
+
+.recent-activities-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #555;
+  margin-bottom: 0.1rem;
+  display: block;
+}
+
+.recent-activities-subtitle {
+  font-size: 0.92rem;
+  color: #a0aec0;
+  font-weight: 400;
+  display: block;
 }
 
 .recent-activities-date-input {
-  width: 8rem;
+  width: 11rem;
+  font-size: 0.95rem;
+  border-radius: 7px;
+  border: 1px solid #dedfe2;
+  padding: 0.3rem 0.7rem;
+  color: #2d4a6a;
+  background: #f8fafc;
 }
 
-.recent-activities-content {
+.recent-activities-list {
   display: flex;
   flex-direction: column;
-  gap: 0.75rem;
+  gap: 0.7rem;
 }
 
-.recent-activity-item {
+.recent-activity-list-item {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.75rem;
-  background-color: hsl(var(--muted) / 0.5);
-  border-radius: 0.5rem;
-  cursor: pointer;
-  transition: background-color 0.2s ease;
+  gap: 0.8rem;
+  padding: 0.7rem 0.7rem 0.7rem 0.7rem;
+  background: #e5e7eb;
+  border-radius: 10px;
+  border: 1px solid #dedfe2;  cursor: pointer;
+  transition: background 0.18s, color 0.18s;
 }
 
-.recent-activity-item:hover {
-  background: linear-gradient(90deg, #82ffff 0%, #5f72bd 100%);
-  color: #fff;
+.recent-activity-list-item:hover {
+  background: #e6f4fa;
+  color: #0d92ae;
+  border: 1.5px solid #0d92ae;
+
 }
 
-.recent-activity-icon {
-  width: 1.25rem;
-  height: 1.25rem;
+.recent-activity-list-icon {
+  width: 1.7rem;
+  height: 1.7rem;
+  color: #0d92ae;
 }
 
-.recent-activity-text {
+.recent-activity-list-text {
   font-weight: 500;
+  color: #2d4a6a;
+  font-size: 1.01rem;
 }
 
-.recent-activity-subtext {
-  font-size: 0.875rem;
-  color: hsl(var(--muted-foreground));
+.recent-activity-list-subtext {
+  font-size: 0.93rem;
+  color: #a0aec0;
 }
 
 .recent-activities-empty {
-  color: hsl(var(--muted-foreground));
+  color: #a0aec0;
   text-align: center;
   padding: 1rem 0;
 }

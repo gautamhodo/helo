@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../styles/page.css';
 import '../styles/form.css';
 import Header from '../components/Header';
@@ -11,6 +11,8 @@ import AddInput from '../components/AddInput';
 import DateInput from '../components/DateInput';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import axios from 'axios';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 interface PageProps {
   sidebarCollapsed?: boolean;
@@ -52,44 +54,75 @@ const BirthRegistration: React.FC<PageProps> = ({ sidebarCollapsed = false, togg
   const [popupMessage, setPopupMessage] = useState('');
   const [showDownload, setShowDownload] = useState(false);
   const [lastRegistered, setLastRegistered] = useState<any>(null);
-  const [printView, setPrintView] = useState(false);
+
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const params = new URLSearchParams(location.search);
+    const id = params.get('id');
+    if (id) {
+      fetch(`/db.json`)
+        .then(res => res.json())
+        .then(data => {
+          const rec = (data.birthRecords || []).find((r: any) => String(r.id) === id);
+          if (rec) setForm(rec);
+        });
+    }
+  }, [location.search]);
 
   const handleChange = (field: string) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     setForm({ ...form, [field]: e.target.value });
   };
 
-  const handlePrint = () => {
-    setPrintView(true);
-    setTimeout(() => {
-      window.print();
-      setPrintView(false);
-    }, 200);
-  };
-
-  const handleRegisterBirth = () => {
+  const handleRegisterBirth = async () => {
     const requiredFields = [
-        'firstName', 'lastName', 'dateOfBirth',
-        'gender', 'placeOfBirth', 'locality', 'modeOfBirth', 'parity', 'birthWeight',
-        'fatherName', 'motherName', 'parentAddress', 'permanentAddress'
+      'firstName', 'lastName', 'dateOfBirth',
+      'gender', 'placeOfBirth', 'locality', 'modeOfBirth', 'parity', 'birthWeight',
+      'fatherName', 'motherName', 'parentAddress', 'permanentAddress'
     ];
     const isFormValid = requiredFields.every(field => (form as any)[field].trim() !== '');
 
     if (!isFormValid) {
-        setPopupMessage('Please fill all required fields before registering.');
-        setShowPopup(true);
-        setShowDownload(false);
-        return;
+      setPopupMessage('Please fill all required fields before registering.');
+      setShowPopup(true);
+      setShowDownload(false);
+      return;
     }
 
     setIsLoading(true);
-    // Simulate API call
-    setTimeout(() => {
-        setIsLoading(false);
+
+    try {
+      const params = new URLSearchParams(location.search);
+      const id = params.get('id');
+      if (id) {
+        // Edit mode: PUT
+        await fetch(`http://localhost:3000/birthRecords/${id}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(form),
+        });
+        setPopupMessage('Birth record updated successfully!');
+      } else {
+        // POST to json-server
+        const response = await fetch('http://localhost:3000/birthRecords', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(form),
+        });
+        const data = await response.json();
+        setLastRegistered({ ...form, id: data.id });
         setPopupMessage('Birth registered successfully!');
-        setShowPopup(true);
-        setShowDownload(true);
-        setLastRegistered({ ...form });
-    }, 1500);
+      }
+      setIsLoading(false);
+      setShowPopup(true);
+      setShowDownload(true);
+    } catch (error) {
+      setIsLoading(false);
+      setPopupMessage('Failed to register birth. Please try again.');
+      setShowPopup(true);
+      setShowDownload(false);
+    }
   };
 
   const handleDownloadCertificate = async () => {
@@ -207,7 +240,7 @@ const BirthRegistration: React.FC<PageProps> = ({ sidebarCollapsed = false, togg
         </form>
         {showPopup && (
           <div>
-            <Popup message={popupMessage} onClose={() => { setShowPopup(false); setShowDownload(false); }} />
+            <Popup message={popupMessage} onClose={() => { setShowPopup(false); setShowDownload(false); navigate('/birth-records'); }} />
             {showDownload && lastRegistered && (
               <div style={{ textAlign: 'center', marginTop: '1rem' }}>
                 <button className="btn-with-gradient" onClick={handleDownloadCertificate}>Download Certificate</button>
@@ -258,53 +291,6 @@ const BirthRegistration: React.FC<PageProps> = ({ sidebarCollapsed = false, togg
                 </div>
               </div>
             )}
-          </div>
-        )}
-        {printView && (
-          <div style={{ position: 'absolute', left: '-9999px', top: 0 }}>
-            <div className="certificate-container" id="certificate-pdf-view">
-              <div className="certificate-header">
-                <div className="certificate-title">REGISTRATION DEPARTMENT</div>
-                <div className="certificate-subtitle">Govt. of Kerala</div>
-                <div style={{ fontWeight: 500, color: '#2d4a6a', marginTop: '0.2rem' }}>
-                  (Export of Online Token Registration)
-                </div>
-              </div>
-              <table className="certificate-table">
-                <tbody>
-                  <tr>
-                    <th>Name of Child</th>
-                    <td>{form.firstName} {form.middleName} {form.lastName}</td>
-                    <th>Date of Birth</th>
-                    <td>{form.dateOfBirth}</td>
-                  </tr>
-                  <tr>
-                    <th>Gender</th>
-                    <td>{form.gender}</td>
-                    <th>Place of Birth</th>
-                    <td>{form.placeOfBirth}</td>
-                  </tr>
-                  <tr>
-                    <th>Father's Name</th>
-                    <td>{form.fatherName}</td>
-                    <th>Mother's Name</th>
-                    <td>{form.motherName}</td>
-                  </tr>
-                  <tr>
-                    <th>Parent Address</th>
-                    <td colSpan={3}>{form.parentAddress}</td>
-                  </tr>
-                  <tr>
-                    <th>Permanent Address</th>
-                    <td colSpan={3}>{form.permanentAddress}</td>
-                  </tr>
-                </tbody>
-              </table>
-              <div className="certificate-footer">
-                <div>Generated on: {new Date().toLocaleDateString()}</div>
-                <div>Signature: ____________________</div>
-              </div>
-            </div>
           </div>
         )}
       </PageContainer>

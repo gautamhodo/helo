@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { NavLink } from "react-router-dom";
 import "../styles/Sidebar.css";
 // import { GraphIcon } from '@primer/octicons-react'
@@ -19,6 +19,17 @@ interface SideBarProps {
 }
 
 const SideBar: React.FC<SideBarProps> = ({ collapsed = false }) => {
+  const [menuSearch, setMenuSearch] = useState('');
+  const menuItems = [
+    { label: 'Dashboard', to: '/' },
+    { label: 'Birth Registration', to: '/birth-registration' },
+    { label: 'Death Registration', to: '/death-registration' },
+    { label: 'Birth List', to: '/birth-records' },
+    { label: 'Death List', to: '/death-records' },
+    { label: 'Certificates', to: '/certificates' },
+  ];
+  const filteredMenu = menuItems.filter(item => item.label.toLowerCase().includes(menuSearch.toLowerCase()));
+
   return (
     <div className={`sidebar ${collapsed ? "collapsed" : ""}`}>
       <div className="sidebar-content">
@@ -45,12 +56,13 @@ const SideBar: React.FC<SideBarProps> = ({ collapsed = false }) => {
                 year:'numeric'
               }).format(new Date())}
             </h6>
-
           </div>
           <input
             type="text"
             className="searchbar"
             placeholder="Search Menu- Ctrl + M"
+            value={menuSearch}
+            onChange={e => setMenuSearch(e.target.value)}
           />
         </div>
       </div>
@@ -58,7 +70,7 @@ const SideBar: React.FC<SideBarProps> = ({ collapsed = false }) => {
         <ul>
           <li className="sidebar-title">
             <NavLink
-              to="/dashboard"
+              to=""
               className={({ isActive }) =>
                 isActive ? "sidebar-heading2 active" : "sidebar-heading2"
               }
@@ -68,97 +80,23 @@ const SideBar: React.FC<SideBarProps> = ({ collapsed = false }) => {
             </NavLink>
           </li>
           <ul className="sidebar-sublist">
-            <li>
-              <NavLink
-                to="/dashboard"
-                style={{fontWeight:400,color:"#cccccc"}}
-                className={({ isActive }) =>
-                  isActive ? "nav-item active" : "nav-item"
-                }
-                title={collapsed ? "Dashboard" : ""}
-              >
-                <span>
-                  <FontAwesomeIcon icon={faCaretRight} />
-                </span>
-                {!collapsed && "Dashboard"}
-              </NavLink>
-            </li>
-            <li>
-              <NavLink
-                to="/birth-registration"
-                style={{fontWeight:400,color:"#cccccc"}}
-                className={({ isActive }) =>
-                  isActive ? "nav-item active" : "nav-item"
-                }
-                title={collapsed ? "Birth Registration" : ""}
-              >
-                <span>
-                  <FontAwesomeIcon icon={faCaretRight} />
-                </span>
-                {!collapsed && "Birth Registration"}
-              </NavLink>
-            </li>
-            <li>
-              <NavLink
-                to="/death-registration"
-                style={{fontWeight:400,color:"#cccccc"}}
-                className={({ isActive }) =>
-                  isActive ? "nav-item active" : "nav-item"
-                }
-                title={collapsed ? "Death Registration" : ""}
-              >
-                <span>
-                  <FontAwesomeIcon icon={faCaretRight} />
-                </span>
-                {!collapsed && "Death Registration"}
-              </NavLink>
-            </li>
-            <li>
-              <NavLink
-                to="/birth-records"
-                style={{fontWeight:400,color:"#cccccc"}}
-                className={({ isActive }) =>
-                  isActive ? "nav-item active" : "nav-item"
-                }
-                title={collapsed ? "Birth List" : ""}
-              >
-                <span>
-                  <FontAwesomeIcon icon={faCaretRight} />
-                </span>
-                {!collapsed && "Birth List"}
-              </NavLink>
-            </li>
-            <li>
-              <NavLink
-                to="/death-records"
-                style={{fontWeight:400,color:"#cccccc"}}
-                className={({ isActive }) =>
-                  isActive ? "nav-item active" : "nav-item"
-                }
-                title={collapsed ? "Death List" : ""}
-              >
-                <span>
-                  <FontAwesomeIcon icon={faCaretRight} />
-                </span>
-                {!collapsed && "Death List"}
-              </NavLink>
-            </li>
-            <li>
-              <NavLink
-                to="/certificates"
-                style={{fontWeight:400,color:"#cccccc"}}
-                className={({ isActive }) =>
-                  isActive ? "nav-item active" : "nav-item"
-                }
-                title={collapsed ? "Certificates" : ""}
-              >
-                <span>
-                  <FontAwesomeIcon icon={faCaretRight} />
-                </span>
-                {!collapsed && "Certificates"}
-              </NavLink>
-            </li>
-           
+            {filteredMenu.map(item => (
+              <li key={item.to}>
+                <NavLink
+                  to={item.to}
+                  style={{fontWeight:400,color:"#cccccc"}}
+                  className={({ isActive }) =>
+                    isActive ? "nav-item active" : "nav-item"
+                  }
+                  title={collapsed ? item.label : ""}
+                >
+                  <span>
+                    <FontAwesomeIcon icon={faCaretRight} />
+                  </span>
+                  {!collapsed && item.label}
+                </NavLink>
+              </li>
+            ))}
           </ul>
         </ul>
       </nav>

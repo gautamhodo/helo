@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import * as XLSX from 'xlsx';
 import '../styles/page.css';
 import '../styles/form.css';
@@ -8,47 +8,51 @@ import Footer from '../components/Footer';
 import PageContainer from '../components/PageContainer';
 import SectionHeading from '../components/SectionHeading';
 import Table from '../components/Table';
+// import { Pencil, Trash } from 'lucide-react';
+import EditButton from '../components/EditButton';
+import DeleteButton from '../components/DeleteButton';
+import { useNavigate } from 'react-router-dom';
+import Searchbar from '../components/Searchbar';
 
 interface PageProps {
   sidebarCollapsed?: boolean;
   toggleSidebar?: () => void;
 }
 
-const mockBirthRecords = [
-  {
-    id: 1,
-    firstName: 'John',
-    lastName: 'Doe',
-    dateOfBirth: '2023-01-15',
-    gender: 'Male',
-    placeOfBirth: 'City Hospital',
-    fatherName: 'Richard Doe',
-    motherName: 'Jane Doe',
-  },
-  {
-    id: 2,
-    firstName: 'Peter',
-    lastName: 'Jones',
-    dateOfBirth: '2023-02-20',
-    gender: 'Male',
-    placeOfBirth: 'Community Clinic',
-    fatherName: 'Robert Jones',
-    motherName: 'Mary Jones',
-  },
-];
-
 const BirthRecords: React.FC<PageProps> = ({ sidebarCollapsed = false, toggleSidebar }) => {
-  const [records, setRecords] = useState(mockBirthRecords);
+  const [records, setRecords] = useState<any[]>([]);
+  const [editId, setEditId] = useState<number | null>(null);
+  const [editForm, setEditForm] = useState<any>({});
+  const [search, setSearch] = useState('');
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    fetch('/db.json')
+      .then(res => res.json())
+      .then(data => setRecords(data.birthRecords || []));
+  }, []);
 
   const handleEdit = (id: number) => {
-    // Placeholder for edit logic
-    console.log('Edit record:', id);
+    navigate(`/birth-registration?id=${id}`);
   };
 
-  const handleDelete = (id: number) => {
-    // Placeholder for delete logic
-    setRecords(records.filter(record => record.id !== id));
-    console.log('Delete record:', id);
+  const handleEditChange = (field: string, value: string) => {
+    setEditForm({ ...editForm, [field]: value });
+  };
+
+  const handleSave = (id: number) => {
+    setRecords(records.map(r => r.id === id ? { ...editForm, id } : r));
+    setEditId(null);
+    setEditForm({});
+  };
+
+  const handleDelete = async (id: number) => {
+    try {
+      await fetch(`http://localhost:3000/birthRecords/${id}`, { method: 'DELETE' });
+      setRecords(records.filter(record => record.id !== id));
+    } catch (err) {
+      alert('Failed to delete record.');
+    }
   };
 
   const handleExportExcel = () => {
@@ -70,16 +74,9 @@ const BirthRecords: React.FC<PageProps> = ({ sidebarCollapsed = false, toggleSid
     { key: 'actions', header: 'Actions' },
   ];
 
-  // Prepare data with actions as a React element
-  const tableData = records.map((record) => ({
-    ...record,
-    actions: (
-      <div className="action-buttons">
-        <button onClick={() => handleEdit(record.id)} className="edit-btn">Edit</button>
-        <button onClick={() => handleDelete(record.id)} className="delete-btn">Delete</button>
-      </div>
-    ),
-  }));
+  const filteredRecords = records.filter(record =>
+    Object.values(record).join(' ').toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
     <>
@@ -88,13 +85,38 @@ const BirthRecords: React.FC<PageProps> = ({ sidebarCollapsed = false, toggleSid
         <SectionHeading title="Birth Records" subtitle="View and manage all birth records" />
 
         <div className="records-table-container">
-          <div className="records-table-header">
-            <h3>All Birth Registrations</h3>
+          <div className="records-table-header" style={{ display: 'flex', gap: '1rem', alignItems: 'center', justifyContent: 'flex-end' }}>
+            <Searchbar value={search} onChange={e => setSearch(e.target.value)} />
             <button onClick={handleExportExcel} className="btn-with-gradient">
               Export to Excel
             </button>
           </div>
-          <Table columns={columns} data={tableData} />
+          <Table columns={columns} data={filteredRecords.map((record) => ({
+            ...record,
+            actions: (
+              <div className="action-buttons">
+                {editId === record.id ? (
+                  <>
+                    <button onClick={() => handleSave(record.id)} className="edit-btn">Save</button>
+                    <button onClick={() => { setEditId(null); setEditForm({}); }} className="delete-btn">Cancel</button>
+                  </>
+                ) : (
+                  <>
+                    <EditButton onClick={() => handleEdit(record.id)} />
+                    <DeleteButton onClick={() => handleDelete(record.id)} size={18} className="delete-btn" />
+                  </>
+                )}
+              </div>
+            ),
+            id: record.id,
+            firstName: editId === record.id ? <input value={editForm.firstName || ''} onChange={e => handleEditChange('firstName', e.target.value)} /> : record.firstName,
+            lastName: editId === record.id ? <input value={editForm.lastName || ''} onChange={e => handleEditChange('lastName', e.target.value)} /> : record.lastName,
+            dateOfBirth: editId === record.id ? <input value={editForm.dateOfBirth || ''} onChange={e => handleEditChange('dateOfBirth', e.target.value)} /> : record.dateOfBirth,
+            gender: editId === record.id ? <input value={editForm.gender || ''} onChange={e => handleEditChange('gender', e.target.value)} /> : record.gender,
+            placeOfBirth: editId === record.id ? <input value={editForm.placeOfBirth || ''} onChange={e => handleEditChange('placeOfBirth', e.target.value)} /> : record.placeOfBirth,
+            fatherName: editId === record.id ? <input value={editForm.fatherName || ''} onChange={e => handleEditChange('fatherName', e.target.value)} /> : record.fatherName,
+            motherName: editId === record.id ? <input value={editForm.motherName || ''} onChange={e => handleEditChange('motherName', e.target.value)} /> : record.motherName,
+          }))} />
         </div>
       </PageContainer>
       <Footer />
