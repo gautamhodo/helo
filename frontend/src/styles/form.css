@@ -149,6 +149,14 @@
   transform: translateY(0);
 }
 
+.btn-with-gradient.outline {
+  background: #f0f0f0;
+  color: #888 !important;
+  border: 1.5px solid #b0b0b0;
+  box-shadow: none;
+  opacity: 0.85;
+}
+
 .spinner {
   display: inline-block;
   width: 1em;

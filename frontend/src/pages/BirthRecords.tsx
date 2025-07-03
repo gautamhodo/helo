@@ -85,11 +85,15 @@ const BirthRecords: React.FC<PageProps> = ({ sidebarCollapsed = false, toggleSid
         <SectionHeading title="Birth Records" subtitle="View and manage all birth records" />
 
         <div className="records-table-container">
-          <div className="records-table-header" style={{ display: 'flex', gap: '1rem', alignItems: 'center', justifyContent: 'flex-end' }}>
-            <Searchbar value={search} onChange={e => setSearch(e.target.value)} />
-            <button onClick={handleExportExcel} className="btn-with-gradient">
-              Export to Excel
-            </button>
+          <div className="records-table-header" style={{ display: 'flex', justifyContent: 'space-between', gap: '1rem', alignItems: 'center', paddingLeft: '2.5rem' }}>
+            <div style={{ display: 'flex', gap: '1rem' }}>
+              <button onClick={handleExportExcel} className="btn-with-gradient">
+                Export to Excel
+              </button>
+            </div>
+            <div style={{ minWidth: 250 }}>
+              <Searchbar value={search} onChange={e => setSearch(e.target.value)} />
+            </div>
           </div>
           <Table columns={columns} data={filteredRecords.map((record) => ({
             ...record,

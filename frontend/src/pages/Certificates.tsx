@@ -49,21 +49,25 @@ const Certificates: React.FC<PageProps> = ({ sidebarCollapsed = false, toggleSid
       <Header sidebarCollapsed={sidebarCollapsed} toggleSidebar={toggleSidebar} showDate showTime showCalculator />
       <PageContainer>
         <SectionHeading title="Certificates" subtitle="View and manage all certificates" />
-        <div style={{ display: 'flex', justifyContent: 'center', margin: '2rem 0', gap: '1rem', alignItems: 'center' }}>
-          <Searchbar value={search} onChange={e => setSearch(e.target.value)} />
-          <button
-            className={`btn-with-gradient${type === 'birth' ? '' : ' outline'}`}
-            style={{ marginRight: '1rem' }}
-            onClick={() => setType('birth')}
-          >
-            Birth Certificate
-          </button>
-          <button
-            className={`btn-with-gradient${type === 'death' ? '' : ' outline'}`}
-            onClick={() => setType('death')}
-          >
-            Death Certificate
-          </button>
+        <div style={{ display: 'flex', justifyContent: 'space-between', margin: '2rem 0', gap: '1rem', alignItems: 'center', paddingLeft: '2.5rem' }}>
+          <div style={{ display: 'flex', gap: '1rem' }}>
+            <button
+              className={`btn-with-gradient${type === 'birth' ? '' : ' outline'}`}
+              style={{ marginRight: '1rem' }}
+              onClick={() => setType('birth')}
+            >
+              Birth Certificate
+            </button>
+            <button
+              className={`btn-with-gradient${type === 'death' ? '' : ' outline'}`}
+              onClick={() => setType('death')}
+            >
+              Death Certificate
+            </button>
+          </div>
+          <div style={{ minWidth: 250 }}>
+            <Searchbar value={search} onChange={e => setSearch(e.target.value)} />
+          </div>
         </div>
         <div className="certificate-list-container">
           {type === 'birth' ? (
@@ -71,7 +75,7 @@ const Certificates: React.FC<PageProps> = ({ sidebarCollapsed = false, toggleSid
               {filteredBirthCertificates.map((cert) => (
                 <li key={cert.tokenNo} className="certificate-list-item">
                   <div>
-                    <strong>{cert.name}</strong> (Token: {cert.tokenNo})<br />
+                    <strong>{cert.firstName} {cert.lastName}</strong><br />
                     DOB: {cert.dateOfBirth} | Father: {cert.fatherName} | Mother: {cert.motherName}
                   </div>
                   <div className="certificate-list-actions">
@@ -85,7 +89,7 @@ const Certificates: React.FC<PageProps> = ({ sidebarCollapsed = false, toggleSid
               {filteredDeathCertificates.map((cert) => (
                 <li key={cert.tokenNo} className="certificate-list-item">
                   <div>
-                    <strong>{cert.name}</strong> (Token: {cert.tokenNo})<br />
+                    <strong>{cert.firstName} {cert.lastName}</strong><br />
                     DOD: {cert.dateOfDeath} | Cause: {cert.causeOfDeath}
                   </div>
                   <div className="certificate-list-actions">
@@ -98,71 +102,120 @@ const Certificates: React.FC<PageProps> = ({ sidebarCollapsed = false, toggleSid
         </div>
         {printCert && (
           <div className="print-certificate-only">
-            <div className="certificate-container" id="certificate-pdf-view">
-              <div className="certificate-header">
-                <div className="certificate-title">REGISTRATION DEPARTMENT</div>
-                <div className="certificate-subtitle">Govt. of Kerala</div>
-                <div style={{ fontWeight: 500, color: '#2d4a6a', marginTop: '0.2rem' }}>
-                  (Export of Online Token Registration)
+            {type === 'birth' ? (
+              <div className="birth-certificate-template" style={{
+                width: '595px',
+                height: '842px',
+                background: '#fdf1e6',
+                border: '6px double #c9a47a',
+                padding: '40px 30px',
+                margin: 'auto',
+                fontFamily: 'serif',
+                position: 'relative',
+                boxSizing: 'border-box',
+                color: '#7c5a36',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+              }}>
+                <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '100%', pointerEvents: 'none' }}>
+                  {/* Corners and border decorations can be added with absolutely positioned SVGs or images if needed */}
+                </div>
+                <div style={{ textAlign: 'center', marginTop: '30px', marginBottom: '40px' }}>
+                  <div style={{ fontSize: '2.1rem', fontWeight: 600, letterSpacing: '2px', fontFamily: 'serif' }}>BIRTH CERTIFICATE</div>
+                </div>
+                <div style={{ fontSize: '1.1rem', textAlign: 'center', marginBottom: '30px' }}>
+                  This Certifies that
+                </div>
+                <div style={{ borderBottom: '1.5px solid #7c5a36', width: '70%', margin: '0 auto 18px', fontSize: '1.2rem', textAlign: 'center', minHeight: '28px' }}>
+                  {printCert.firstName} {printCert.middleName} {printCert.lastName}
+                </div>
+                <div style={{ fontSize: '1.1rem', textAlign: 'center', marginBottom: '18px' }}>
+                  Was born to
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '2rem', marginBottom: '18px' }}>
+                  <div style={{ borderBottom: '1.5px solid #7c5a36', minWidth: '180px', textAlign: 'center', minHeight: '28px' }}>{printCert.fatherName}</div>
+                  <span style={{ alignSelf: 'flex-end', marginBottom: '4px' }}>and</span>
+                  <div style={{ borderBottom: '1.5px solid #7c5a36', minWidth: '180px', textAlign: 'center', minHeight: '28px' }}>{printCert.motherName}</div>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem', marginBottom: '18px', fontSize: '1.1rem' }}>
+                  <span>On this</span>
+                  <div style={{ borderBottom: '1.5px solid #7c5a36', minWidth: '60px', textAlign: 'center', minHeight: '28px' }}>{printCert.dateOfBirth ? new Date(printCert.dateOfBirth).getDate() : ''}</div>
+                  <span>Day of</span>
+                  <div style={{ borderBottom: '1.5px solid #7c5a36', minWidth: '100px', textAlign: 'center', minHeight: '28px' }}>{printCert.dateOfBirth ? new Date(printCert.dateOfBirth).toLocaleString('default', { month: 'long' }) : ''}</div>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem', marginBottom: '18px', fontSize: '1.1rem' }}>
+                  <span>In the year</span>
+                  <div style={{ borderBottom: '1.5px solid #7c5a36', minWidth: '80px', textAlign: 'center', minHeight: '28px' }}>{printCert.dateOfBirth ? new Date(printCert.dateOfBirth).getFullYear() : ''}</div>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '1.5rem', marginBottom: '40px', fontSize: '1.1rem' }}>
+                  <span>At</span>
+                  <div style={{ borderBottom: '1.5px solid #7c5a36', minWidth: '320px', textAlign: 'center', minHeight: '28px' }}>{printCert.placeOfBirth}</div>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '60px', fontSize: '1.1rem' }}>
+                  <div style={{ borderBottom: '1.5px solid #7c5a36', minWidth: '180px', textAlign: 'center', minHeight: '28px' }}></div>
+                  <div style={{ borderBottom: '1.5px solid #7c5a36', minWidth: '180px', textAlign: 'center', minHeight: '28px' }}></div>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.1rem', marginTop: '8px' }}>
+                  <span style={{ marginLeft: '18px' }}>Doctor on duty</span>
+                  <span style={{ marginRight: '18px' }}>Medical officer</span>
                 </div>
               </div>
-              <table className="certificate-table">
-                <tbody>
-                  <tr>
-                    <th>Token No.</th>
-                    <td>{printCert.tokenNo}</td>
-                    <th>Year</th>
-                    <td>2024</td>
-                  </tr>
-                  <tr>
-                    <th>Sub Register Office</th>
-                    <td>Chalakudy</td>
-                    <th>Place</th>
-                    <td>Chalakudy</td>
-                  </tr>
-                </tbody>
-              </table>
-              <div className="certificate-section-title">Personal Details</div>
-              <table className="certificate-table">
-                <tbody>
-                  {type === 'birth' ? (
-                    <>
-                      <tr>
-                        <th>Name of Child</th>
-                        <td>{printCert.name}</td>
-                        <th>Father's Name</th>
-                        <td>{printCert.fatherName}</td>
-                      </tr>
-                      <tr>
-                        <th>Mother's Name</th>
-                        <td>{printCert.motherName}</td>
-                        <th>Date of Birth</th>
-                        <td>{printCert.dateOfBirth}</td>
-                      </tr>
-                    </>
-                  ) : (
-                    <>
-                      <tr>
-                        <th>Name of Deceased</th>
-                        <td>{printCert.name}</td>
-                        <th>Date of Death</th>
-                        <td>{printCert.dateOfDeath}</td>
-                      </tr>
-                      <tr>
-                        <th>Cause of Death</th>
-                        <td>{printCert.causeOfDeath}</td>
-                        <th>Place of Death</th>
-                        <td>Chalakudy</td>
-                      </tr>
-                    </>
-                  )}
-                </tbody>
-              </table>
-              <div className="certificate-footer">
-                <div>Generated on: {new Date().toLocaleDateString()}</div>
-                <div>Signature: ____________________</div>
+            ) : (
+              <div className="death-certificate-template" style={{
+                width: '800px',
+                height: '570px',
+                background: '#fdf1e6',
+                border: '4px solid #7c5a36',
+                padding: '40px 50px',
+                margin: 'auto',
+                fontFamily: 'serif',
+                position: 'relative',
+                boxSizing: 'border-box',
+                color: '#7c5a36',
+                display: 'flex',
+                flexDirection: 'column',
+                justifyContent: 'space-between',
+              }}>
+                <div style={{ position: 'absolute', top: 0, left: 0, right: 0, height: '100%', pointerEvents: 'none' }}>
+                  {/* Border decorations can be added with SVGs or images if needed */}
+                </div>
+                <div style={{ textAlign: 'center', marginTop: '10px', marginBottom: '10px' }}>
+                  <div style={{ fontSize: '2.1rem', fontWeight: 600, letterSpacing: '2px', fontFamily: 'serif' }}>HOSPITAL DEATH CERTIFICATE</div>
+                  <div style={{ fontSize: '1.1rem', marginTop: '8px', marginBottom: '18px', fontStyle: 'italic' }}>
+                    This certifies that the information below is correct
+                  </div>
+                  <div style={{ fontSize: '2.5rem', fontWeight: 500, fontFamily: 'cursive', margin: '18px 0 18px 0', color: '#6d3b2c' }}>
+                    {printCert.firstName} {printCert.lastName}
+                  </div>
+                </div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '18px', fontSize: '1.1rem', margin: '0 0 18px 0' }}>
+                  <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
+                    <span style={{ minWidth: '120px' }}>DATE OF BIRTH:</span>
+                    <div style={{ borderBottom: '1.5px solid #7c5a36', minWidth: '220px', minHeight: '28px', textAlign: 'center' }}>{printCert.dateOfBirth || ''}</div>
+                    <span style={{ minWidth: '120px', marginLeft: '40px' }}>DATE OF DEATH:</span>
+                    <div style={{ borderBottom: '1.5px solid #7c5a36', minWidth: '220px', minHeight: '28px', textAlign: 'center' }}>{printCert.dateOfDeath || ''}</div>
+                  </div>
+                  <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
+                    <span style={{ minWidth: '120px' }}>CAUSE OF DEATH:</span>
+                    <div style={{ borderBottom: '1.5px solid #7c5a36', minWidth: '600px', minHeight: '28px', textAlign: 'center' }}>{printCert.causeOfDeath || ''}</div>
+                  </div>
+                  <div style={{ display: 'flex', gap: '1.5rem', alignItems: 'center' }}>
+                    <span style={{ minWidth: '120px' }}>ADDRESS:</span>
+                    <div style={{ borderBottom: '1.5px solid #7c5a36', minWidth: '600px', minHeight: '28px', textAlign: 'center' }}>{printCert.permanentAddress || ''}</div>
+                  </div>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: '40px', fontSize: '1.1rem' }}>
+                  <div style={{ borderBottom: '1.5px solid #7c5a36', minWidth: '180px', textAlign: 'center', minHeight: '28px' }}></div>
+                  <div style={{ borderBottom: '1.5px solid #7c5a36', minWidth: '180px', textAlign: 'center', minHeight: '28px' }}></div>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '1.1rem', marginTop: '8px' }}>
+                  <span style={{ marginLeft: '18px' }}>DATE</span>
+                  <span style={{ marginRight: '18px' }}>SIGNED</span>
+                </div>
+                <div style={{ textAlign: 'center', fontSize: '0.95rem', color: '#bfa07a', marginTop: '10px' }}>TemplateLAB</div>
               </div>
-            </div>
+            )}
           </div>
         )}
       </PageContainer>

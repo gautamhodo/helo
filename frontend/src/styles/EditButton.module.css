@@ -4,16 +4,13 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  border: none;
-  border-radius: 4px;
-  background-color: #abecb0;
-  color: #1c1c1c;
+  border-radius: 5px;
+  border: 0.5px solid #b9a2a2;
+  background-color: #128b69;
+  color: #fff;
   cursor: pointer;
-  transition: all 0.2s ease;
-  padding: 0;
+  /* margin-left:3px; */
+  /* transition: all 0.2s ease; */
+  padding: 3px;
 }
 
-.editButton:hover {
-  background-color: #abfab3;
-  color: #000;
-}

@@ -35,7 +35,7 @@ const RecentActivities = () => {
           id: `death-${record.id}`,
           type: 'death',
           name: `${record.firstName} ${record.lastName}`,
-          date: new Date(record.dateOfBirth), // No dateOfDeath in data, so using dateOfBirth
+          date: new Date(record.dateOfDeath),
           icon: Heart,
           color: 'text-danger',
         }));
