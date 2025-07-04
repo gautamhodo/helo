@@ -13,6 +13,7 @@ import EditButton from '../components/EditButton';
 import DeleteButton from '../components/DeleteButton';
 import { useNavigate } from 'react-router-dom';
 import Searchbar from '../components/Searchbar';
+import { getDeathRecords, deleteDeathRecord } from '../api/api';
 
 interface PageProps {
   sidebarCollapsed?: boolean;
@@ -27,9 +28,9 @@ const DeathRecords: React.FC<PageProps> = ({ sidebarCollapsed = false, toggleSid
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch('/db.json')
-      .then(res => res.json())
-      .then(data => setRecords(data.deathRecords || []));
+    getDeathRecords()
+      .then(data => setRecords(data))
+      .catch(() => setRecords([]));
   }, []);
 
   const handleEdit = (id: number) => {
@@ -46,12 +47,12 @@ const DeathRecords: React.FC<PageProps> = ({ sidebarCollapsed = false, toggleSid
     setEditForm({});
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: string) => {
     try {
-      await fetch(`http://localhost:3000/deathRecords/${id}`, { method: 'DELETE' });
+      await deleteDeathRecord(id);
       setRecords(records.filter(record => record.id !== id));
-    } catch (err) {
-      alert('Failed to delete record.');
+    } catch (error) {
+      alert('Error deleting record.');
     }
   };
 

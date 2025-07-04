@@ -1,5 +1,5 @@
 import React from 'react';
-import '../styles/form.css';
+// import '../styles/form.css';
 
 interface InputProps {
   label: string;
@@ -14,7 +14,7 @@ const Input: React.FC<InputProps> = ({ label, value, onChange, placeholder, type
   <div className="input-container">
     <label className="input-label">{label}</label>
     <input
-      className="input-box"
+      className="form-control"
       type={type}
       value={value}
       onChange={onChange}

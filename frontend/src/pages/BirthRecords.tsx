@@ -13,6 +13,7 @@ import EditButton from '../components/EditButton';
 import DeleteButton from '../components/DeleteButton';
 import { useNavigate } from 'react-router-dom';
 import Searchbar from '../components/Searchbar';
+import { getBirthRecords, deleteBirthRecord } from '../api/api';
 
 interface PageProps {
   sidebarCollapsed?: boolean;
@@ -27,9 +28,9 @@ const BirthRecords: React.FC<PageProps> = ({ sidebarCollapsed = false, toggleSid
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch('/db.json')
-      .then(res => res.json())
-      .then(data => setRecords(data.birthRecords || []));
+    getBirthRecords()
+      .then(data => setRecords(data))
+      .catch(() => setRecords([]));
   }, []);
 
   const handleEdit = (id: number) => {
@@ -46,12 +47,12 @@ const BirthRecords: React.FC<PageProps> = ({ sidebarCollapsed = false, toggleSid
     setEditForm({});
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: string) => {
     try {
-      await fetch(`http://localhost:3000/birthRecords/${id}`, { method: 'DELETE' });
+      await deleteBirthRecord(id);
       setRecords(records.filter(record => record.id !== id));
-    } catch (err) {
-      alert('Failed to delete record.');
+    } catch (error) {
+      alert('Error deleting record.');
     }
   };
 
@@ -63,7 +64,8 @@ const BirthRecords: React.FC<PageProps> = ({ sidebarCollapsed = false, toggleSid
   };
 
   const columns = [
-    { key: 'id', header: 'ID' },
+    { key: 'index', header: 'ID.' },
+    // { key: 'id', header: 'ID' },
     { key: 'firstName', header: 'First Name' },
     { key: 'lastName', header: 'Last Name' },
     { key: 'dateOfBirth', header: 'Date of Birth' },
@@ -95,7 +97,8 @@ const BirthRecords: React.FC<PageProps> = ({ sidebarCollapsed = false, toggleSid
               <Searchbar value={search} onChange={e => setSearch(e.target.value)} />
             </div>
           </div>
-          <Table columns={columns} data={filteredRecords.map((record) => ({
+          <Table columns={columns} data={filteredRecords.map((record, idx) => ({
+            index: idx + 1,
             ...record,
             actions: (
               <div className="action-buttons">
@@ -112,7 +115,6 @@ const BirthRecords: React.FC<PageProps> = ({ sidebarCollapsed = false, toggleSid
                 )}
               </div>
             ),
-            id: record.id,
             firstName: editId === record.id ? <input value={editForm.firstName || ''} onChange={e => handleEditChange('firstName', e.target.value)} /> : record.firstName,
             lastName: editId === record.id ? <input value={editForm.lastName || ''} onChange={e => handleEditChange('lastName', e.target.value)} /> : record.lastName,
             dateOfBirth: editId === record.id ? <input value={editForm.dateOfBirth || ''} onChange={e => handleEditChange('dateOfBirth', e.target.value)} /> : record.dateOfBirth,

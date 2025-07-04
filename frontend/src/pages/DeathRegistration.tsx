@@ -28,6 +28,8 @@ const Popup = ({ message, onClose }: { message: string, onClose: () => void }) =
   </div>
 );
 
+const API_BASE = `${window.location.protocol}//${window.location.hostname}:3000`;
+
 const DeathRegistration: React.FC<PageProps> = ({ sidebarCollapsed = false, toggleSidebar }) => {
   const [form, setForm] = useState({
     firstName: '',
@@ -54,7 +56,7 @@ const DeathRegistration: React.FC<PageProps> = ({ sidebarCollapsed = false, togg
     const params = new URLSearchParams(location.search);
     const id = params.get('id');
     if (id) {
-      fetch(`/db.json`)
+      fetch(`${API_BASE}/deathRecords/${id}`)
         .then(res => res.json())
         .then(data => {
           const rec = (data.deathRecords || []).find((r: any) => String(r.id) === id);
@@ -92,7 +94,7 @@ const DeathRegistration: React.FC<PageProps> = ({ sidebarCollapsed = false, togg
       const id = params.get('id');
       if (id) {
         // Edit mode: PUT
-        await fetch(`http://localhost:3000/deathRecords/${id}`, {
+        await fetch(`${API_BASE}/deathRecords/${id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(form),
@@ -100,7 +102,7 @@ const DeathRegistration: React.FC<PageProps> = ({ sidebarCollapsed = false, togg
         setPopupMessage('Death record updated successfully!');
       } else {
         // POST to json-server
-        const response = await fetch('http://localhost:3000/deathRecords', {
+        const response = await fetch(`${API_BASE}/deathRecords`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(form),

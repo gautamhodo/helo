@@ -28,6 +28,8 @@ const Popup = ({ message, onClose }: { message: string, onClose: () => void }) =
   </div>
 );
 
+const API_BASE = `${window.location.protocol}//${window.location.hostname}:3000`;
+
 const BirthRegistration: React.FC<PageProps> = ({ sidebarCollapsed = false, toggleSidebar }) => {
   // State for form fields
   const [form, setForm] = useState({
@@ -62,7 +64,7 @@ const BirthRegistration: React.FC<PageProps> = ({ sidebarCollapsed = false, togg
     const params = new URLSearchParams(location.search);
     const id = params.get('id');
     if (id) {
-      fetch(`/db.json`)
+      fetch(`${API_BASE}/birthRecords/${id}`)
         .then(res => res.json())
         .then(data => {
           const rec = (data.birthRecords || []).find((r: any) => String(r.id) === id);
@@ -97,7 +99,7 @@ const BirthRegistration: React.FC<PageProps> = ({ sidebarCollapsed = false, togg
       const id = params.get('id');
       if (id) {
         // Edit mode: PUT
-        await fetch(`http://localhost:3000/birthRecords/${id}`, {
+        await fetch(`${API_BASE}/birthRecords/${id}`, {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(form),
@@ -105,7 +107,7 @@ const BirthRegistration: React.FC<PageProps> = ({ sidebarCollapsed = false, togg
         setPopupMessage('Birth record updated successfully!');
       } else {
         // POST to json-server
-        const response = await fetch('http://localhost:3000/birthRecords', {
+        const response = await fetch(`${API_BASE}/birthRecords`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(form),

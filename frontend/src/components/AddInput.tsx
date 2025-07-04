@@ -1,5 +1,5 @@
 import React from 'react';
-import '../styles/form.css';
+// import '../styles/form.css';
 
 interface AddInputProps {
   label: string;
@@ -13,7 +13,7 @@ const AddInput: React.FC<AddInputProps> = ({ label, value, onChange, placeholder
   <div className="addinput-container">
     <label className="addinput-label">{label}</label>
     <textarea
-      className="addinput-textarea"
+      className="form-control"
       value={value}
       onChange={onChange}
       placeholder={placeholder}

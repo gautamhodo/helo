@@ -1,5 +1,5 @@
 import React from 'react';
-import '../styles/form.css';
+// import '../styles/form.css';
 
 interface Option {
   label: string;
@@ -17,7 +17,7 @@ interface DropInputProps {
 const DropInput: React.FC<DropInputProps> = ({ label, value, onChange, options, width }) => (
   <div className="dropinput-container">
     <label className="dropinput-label">{label}</label>
-    <select className="dropinput-select" value={value} onChange={onChange} style={width ? { width } : {}}>
+    <select className="form-select" value={value} onChange={onChange} style={width ? { width } : {}}>
       <option value="" disabled>Select {label}</option>
       {options.map((option) => (
         <option key={option.value} value={option.value}>
